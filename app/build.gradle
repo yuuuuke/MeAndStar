@@ -2,7 +2,7 @@ plugins {
     id 'com.android.application'
     id 'org.jetbrains.kotlin.android'
 }
-
+apply plugin: 'kotlin-kapt'
 android {
     namespace 'com.zhpew.meandstar'
     compileSdk 33
@@ -70,23 +70,19 @@ dependencies {
     // UI Tests
     androidTestImplementation 'androidx.compose.ui:ui-test-junit4'
     debugImplementation 'androidx.compose.ui:ui-test-manifest'
-
-    // Optional - Included automatically by material, only add when you need
-    // the icons but not the material library (e.g. when using Material3 or a
-    // custom design system based on Foundation)
     implementation 'androidx.compose.material:material-icons-core'
-    // Optional - Add full set of material icons
     implementation 'androidx.compose.material:material-icons-extended'
-    // Optional - Add window size utils
     implementation 'androidx.compose.material3:material3-window-size-class'
-
-    // Optional - Integration with activities
     implementation 'androidx.activity:activity-compose:1.6.1'
-    // Optional - Integration with ViewModels
     implementation 'androidx.lifecycle:lifecycle-viewmodel-compose:2.5.1'
-    // Optional - Integration with LiveData
     implementation 'androidx.compose.runtime:runtime-livedata'
-    // Optional - Integration with RxJava
-    implementation 'androidx.compose.runtime:runtime-rxjava2'
     implementation "androidx.constraintlayout:constraintlayout-compose:1.0.1"
+
+    def room_version = "2.5.0"
+
+    implementation "androidx.room:room-ktx:$room_version"
+    kapt "androidx.room:room-compiler:$room_version"
+    androidTestImplementation "androidx.room:room-testing:$room_version"
+
+    implementation 'com.github.bumptech.glide:glide:4.15.1'
 }

@@ -2,7 +2,7 @@ package com.zhpew.meandstar.utils
 
 import android.content.Context
 import android.view.WindowManager
-import com.zhpew.meandstar.MyApplication
+import com.zhpew.meandstar.app.MyApplication
 
 fun getScreenWidth(): Int {
     return (MyApplication.instance.getSystemService(Context.WINDOW_SERVICE) as WindowManager).defaultDisplay

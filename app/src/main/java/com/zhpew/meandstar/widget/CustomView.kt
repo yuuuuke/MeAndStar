@@ -1,30 +1,16 @@
 package com.zhpew.meandstar.widget
 
-import android.animation.Animator
 import android.animation.ObjectAnimator
-import android.graphics.DashPathEffect
-import android.util.Log
-import android.view.animation.AccelerateDecelerateInterpolator
-import android.view.animation.AccelerateInterpolator
 import android.view.animation.LinearInterpolator
 import androidx.compose.foundation.Canvas
-import androidx.compose.foundation.layout.fillMaxHeight
-import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Offset
-import androidx.compose.ui.geometry.Rect
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Paint
 import androidx.compose.ui.graphics.PaintingStyle
-import androidx.compose.ui.graphics.Path
-import androidx.compose.ui.graphics.PathEffect.Companion.dashPathEffect
 import androidx.compose.ui.graphics.drawscope.drawIntoCanvas
 import com.zhpew.meandstar.bean.Point
-import com.zhpew.meandstar.utils.getScreenHeight
-import com.zhpew.meandstar.utils.getScreenWidth
-import java.util.Queue
-import kotlin.math.round
 
 object CustomView {
 
@@ -40,12 +26,12 @@ object CustomView {
             points.add(point)
         }
         paint.apply {
-            strokeWidth = 5f
+            strokeWidth = 3f
             style = PaintingStyle.Stroke
         }
         animator.apply {
             repeatCount = -1
-            duration = 5000
+            duration = 3000
             interpolator = LinearInterpolator()
             start()
         }
@@ -53,10 +39,11 @@ object CustomView {
             modifier
         ) {
             drawIntoCanvas {
+//                paint.pathEffect = dashPathEffect(FloatArray(2) { 5f }, 5f)
                 for (point in points) {
                     if (point.isStart) {
                         paint.color = Color(point.color)
-                        paint.alpha = (200 - point.radus) / 200
+                        paint.alpha = (100 - point.radus) / 100
 
                         it.drawCircle(
                             Offset(point.x.toFloat(), point.y.toFloat()),
@@ -65,15 +52,7 @@ object CustomView {
                         )
                     }
                 }
-                val path = Path()
-                path.addOval(
-                    Rect(
-                        Offset(0f, 0f),
-                        Offset(animatorValue.value, animatorValue.value)
-                    )
-                )
-                paint.pathEffect = dashPathEffect(FloatArray(2) { 20f }, 5f)
-                it.drawPath(path, paint)
+                animatorValue.value
             }
         }
     }

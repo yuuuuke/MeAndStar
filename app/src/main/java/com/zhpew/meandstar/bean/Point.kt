@@ -28,7 +28,7 @@ class Point {
             (Math.random() * 255).toFloat()
         )
         startProgress = (Math.random() * 200).toInt()
-        animator.duration = 5000
+        animator.duration = 3000
         animator.interpolator = DecelerateInterpolator()
         animator.addListener(object:AnimatorListener{
             override fun onAnimationStart(animation: Animator) {
@@ -60,6 +60,6 @@ class Point {
     }
 
     private fun setValue(vararg: Float) {
-        radus = vararg
+        radus = vararg/2
     }
 }
