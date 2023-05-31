@@ -16,10 +16,12 @@ import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.viewinterop.AndroidView
+import androidx.compose.ui.zIndex
 import androidx.fragment.app.Fragment
 import com.zhpew.meandstar.base.BaseActivity
 import com.zhpew.meandstar.vm.MainViewModel
 import com.zhpew.meandstar.R
+import com.zhpew.meandstar.fragment.DateFragment
 import com.zhpew.meandstar.fragment.DiaryFragment
 import com.zhpew.meandstar.fragment.HomeFragment
 
@@ -35,6 +37,7 @@ class MainActivity : BaseActivity<MainViewModel>() {
 
     private val homeFragment = HomeFragment()
     private val diaryFragment = DiaryFragment()
+    private val dateFragment = DateFragment()
 
     private val fragments = HashMap<Int, Fragment>()
 //    private var currentFragment = HOME
@@ -61,6 +64,7 @@ class MainActivity : BaseActivity<MainViewModel>() {
                 Modifier
                     .fillMaxWidth()
                     .height(70.dp)
+                    .zIndex(10f)
             ) {
                 BottomItem(
                     modifier = Modifier.weight(1F, true),
@@ -159,6 +163,14 @@ class MainActivity : BaseActivity<MainViewModel>() {
                         .commit()
                 } else {
                     supportFragmentManager.beginTransaction().show(diaryFragment).commit()
+                }
+            4->
+                if (fragments[index] == null) {
+                    fragments[index] = dateFragment
+                    supportFragmentManager.beginTransaction().add(pageContainer.id, dateFragment)
+                        .commit()
+                } else {
+                    supportFragmentManager.beginTransaction().show(dateFragment).commit()
                 }
         }
     }
