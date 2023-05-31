@@ -41,7 +41,7 @@ class MainActivity : BaseActivity<MainViewModel>() {
 
     @Composable
     override fun InitComposeView() {
-        setStatusBarColor(false)
+        setStatusBarColor(isBlack = true)
         Column(
             Modifier
                 .fillMaxWidth()

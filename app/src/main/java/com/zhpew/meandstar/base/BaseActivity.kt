@@ -32,8 +32,8 @@ abstract class BaseActivity<VM : BaseViewModel> : FragmentActivity() {
         vm = initViewModel()
     }
 
-    protected fun setStatusBarColor(isWhite:Boolean) {
-        if(isWhite){
+    protected fun setStatusBarColor(isBlack:Boolean) {
+        if(isBlack){
             val flags = window.decorView.systemUiVisibility
             window.decorView.systemUiVisibility = flags or View.SYSTEM_UI_FLAG_LIGHT_STATUS_BAR
         }else{
