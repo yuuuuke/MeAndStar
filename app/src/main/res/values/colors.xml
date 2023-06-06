@@ -16,5 +16,8 @@
     <color name="bg_color">#F7F0F0</color>
     <color name="sub_text_color">#565656</color>
     <color name="hint_text_color">#717171</color>
-
+    <color name="color_26AA89">#26AA89</color>
+    <color name="color_22856C">#22856C</color>
+    <color name="color_E46962">#E46962</color>
+    <color name="color_B63028">#B63028</color>
 </resources>
