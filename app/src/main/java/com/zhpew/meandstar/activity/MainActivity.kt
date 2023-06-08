@@ -5,6 +5,7 @@ import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
+import androidx.compose.material.FloatingActionButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.mutableStateOf
@@ -17,6 +18,7 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.viewinterop.AndroidView
 import androidx.compose.ui.zIndex
+import androidx.constraintlayout.compose.ConstraintLayout
 import androidx.fragment.app.Fragment
 import com.zhpew.meandstar.base.BaseActivity
 import com.zhpew.meandstar.vm.MainViewModel
@@ -27,11 +29,6 @@ import com.zhpew.meandstar.fragment.HomeFragment
 
 class MainActivity : BaseActivity<MainViewModel>() {
 
-//    companion object{
-//        const val HOME = "HOME"
-//        const val DIARY = "DIARY"
-//    }
-
     private var mSelectedPage: MutableState<Int> = mutableStateOf(0)
     private lateinit var pageContainer: FrameLayout
 
@@ -40,7 +37,6 @@ class MainActivity : BaseActivity<MainViewModel>() {
     private val dateFragment = DateFragment()
 
     private val fragments = HashMap<Int, Fragment>()
-//    private var currentFragment = HOME
 
     @Composable
     override fun InitComposeView() {
@@ -50,15 +46,45 @@ class MainActivity : BaseActivity<MainViewModel>() {
                 .fillMaxWidth()
                 .fillMaxHeight()
         ) {
-            AndroidView<FrameLayout>(
-                factory = {
-                    pageContainer = FrameLayout(it)
-                    pageContainer.id = R.id.container_fragment
-                    pageContainer
-                }, modifier = Modifier
+            ConstraintLayout(
+                modifier = Modifier
                     .fillMaxWidth()
                     .weight(1f, true)
-            )
+            ) {
+                val flb = createRef()
+                AndroidView<FrameLayout>(
+                    factory = {
+                        pageContainer = FrameLayout(it)
+                        pageContainer.id = R.id.container_fragment
+                        pageContainer
+                    },
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .fillMaxHeight()
+                )
+                if(mSelectedPage.value != 0 && mSelectedPage.value !=1){
+                    FloatingActionButton(onClick = {
+
+                    }, backgroundColor = colorResource(id = R.color.color_E46962),
+                        modifier = Modifier
+                            .constrainAs(flb) {
+                                bottom.linkTo(parent.bottom)
+                                end.linkTo(parent.end)
+                            }
+                            .padding(end = 16.dp, bottom = 16.dp)
+                            .width(66.dp)
+                            .height(66.dp)) {
+                        Image(
+                            painter = painterResource(id = R.drawable.icon_add),
+                            contentDescription = "",
+                            modifier = Modifier
+                                .padding(15.dp)
+                                .fillMaxWidth()
+                                .fillMaxHeight()
+                        )
+                    }
+                }
+            }
 
             Row(
                 Modifier
@@ -164,7 +190,7 @@ class MainActivity : BaseActivity<MainViewModel>() {
                 } else {
                     supportFragmentManager.beginTransaction().show(diaryFragment).commit()
                 }
-            4->
+            4 ->
                 if (fragments[index] == null) {
                     fragments[index] = dateFragment
                     supportFragmentManager.beginTransaction().add(pageContainer.id, dateFragment)

@@ -6,8 +6,10 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.Card
+import androidx.compose.material.FloatingActionButton
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -21,11 +23,14 @@ import com.zhpew.meandstar.R
 import com.zhpew.meandstar.activity.DateEditActivity
 import com.zhpew.meandstar.base.BaseFragment
 import com.zhpew.meandstar.vm.DateViewModel
+import com.zhpew.meandstar.widget.AddDateDialog
 
 /**
  * 纪念日
  */
 class DateFragment : BaseFragment<DateViewModel>() {
+
+    val showDatePicker = mutableStateOf(false)
 
     @Composable
     override fun InitComposeView() {
@@ -52,6 +57,11 @@ class DateFragment : BaseFragment<DateViewModel>() {
             }
             HeaderView()
             ListData()
+            if(showDatePicker.value){
+                AddDateDialog{
+                    showDatePicker.value = false
+                }
+            }
         }
     }
 
@@ -118,7 +128,7 @@ class DateFragment : BaseFragment<DateViewModel>() {
                         .height(52.dp)
                         .fillMaxWidth()
                         .clickable {
-                            DateEditActivity.startAct(this@DateFragment.requireContext())
+                            showDatePicker.value = true
                         }
                 ) {
                     Row(
@@ -168,10 +178,5 @@ class DateFragment : BaseFragment<DateViewModel>() {
             }
         }
         )
-    }
-
-    @Composable
-    private fun Item() {
-
     }
 }

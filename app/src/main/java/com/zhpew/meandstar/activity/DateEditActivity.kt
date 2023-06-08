@@ -30,16 +30,11 @@ class DateEditActivity : BaseActivity<DateEditViewModel>() {
                 .fillMaxWidth()
                 .fillMaxHeight()
         ) {
-            Box(
-                Modifier
-                    .fillMaxWidth()
-                    .height(24.dp)
-                    .background(colorResource(id = R.color.main_color))
-            ) {}
             ActionBar("12345"){
                 finish()
             }
         }
+
     }
 
 }
