@@ -1,36 +1,38 @@
 package com.zhpew.meandstar.fragment
 
+import android.util.Log
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.Card
-import androidx.compose.material.FloatingActionButton
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clip
 import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.compose.ui.zIndex
+import androidx.compose.ui.window.Dialog
 import com.zhpew.meandstar.R
-import com.zhpew.meandstar.activity.DateEditActivity
 import com.zhpew.meandstar.base.BaseFragment
+import com.zhpew.meandstar.db.dbEntity.CommemorationDayEntity
 import com.zhpew.meandstar.vm.DateViewModel
 import com.zhpew.meandstar.widget.AddDateDialog
+import com.zhpew.meandstar.widget.DatePickerView
 
 /**
  * 纪念日
  */
 class DateFragment : BaseFragment<DateViewModel>() {
 
-    val showDatePicker = mutableStateOf(false)
+    private val showAddDataDialog = mutableStateOf(false)
+    private val showDatePicker = mutableStateOf(false)
+
+    private val clickedItem = mutableStateOf<CommemorationDayEntity?>(null)
 
     @Composable
     override fun InitComposeView() {
@@ -57,11 +59,9 @@ class DateFragment : BaseFragment<DateViewModel>() {
             }
             HeaderView()
             ListData()
-            if(showDatePicker.value){
-                AddDateDialog{
-                    showDatePicker.value = false
-                }
-            }
+
+            AddDate()
+            DatePicker()
         }
     }
 
@@ -128,7 +128,7 @@ class DateFragment : BaseFragment<DateViewModel>() {
                         .height(52.dp)
                         .fillMaxWidth()
                         .clickable {
-                            showDatePicker.value = true
+                            showAddDataDialog.value = true
                         }
                 ) {
                     Row(
@@ -178,5 +178,37 @@ class DateFragment : BaseFragment<DateViewModel>() {
             }
         }
         )
+    }
+
+    @Composable
+    private fun AddDate() {
+        if (showAddDataDialog.value) {
+            AddDateDialog(clickedItem.value, {
+                vm.updateData(it)
+            }, {
+                showAddDataDialog.value = false
+            }, {
+                //打开日期选择器
+                showDatePicker.value = true
+            })
+        }
+    }
+
+    @Composable
+    private fun DatePicker() {
+        if (showDatePicker.value) {
+            Dialog(onDismissRequest = { showDatePicker.value = false }) {
+                Card(
+                    shape = RoundedCornerShape(12.dp),
+                    modifier = Modifier
+                        .width(200.dp)
+                        .height(260.dp),
+                ) {
+                    DatePickerView(title = "选择日期", null) {
+                        Log.v("zwp", it.toString())
+                    }
+                }
+            }
+        }
     }
 }

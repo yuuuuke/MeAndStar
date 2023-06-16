@@ -12,7 +12,7 @@ import java.lang.reflect.ParameterizedType
 
 abstract class BaseFragment<T : BaseViewModel> : Fragment() {
 
-    private lateinit var vm: T
+    protected lateinit var vm: T
 
     override fun onCreateView(
         inflater: LayoutInflater,

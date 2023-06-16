@@ -1,35 +1,42 @@
 package com.zhpew.meandstar.widget
 
-import android.app.Dialog
-import android.content.Context
-import android.view.View
-import android.widget.EditText
-import android.widget.TextView
+import android.util.Log
 import androidx.compose.foundation.background
-import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.BasicTextField
 import androidx.compose.material3.Card
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Text
-import androidx.compose.material3.TextField
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Dialog
 import com.zhpew.meandstar.R
+import com.zhpew.meandstar.db.dbEntity.CommemorationDayEntity
+import com.zhpew.meandstar.utils.noAnimClick
+import com.zhpew.meandstar.utils.string2Time
+import com.zhpew.meandstar.utils.time2String
 
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun AddDateDialog(onDismiss: () -> Unit) {
-    Dialog(onDismissRequest = { onDismiss() }) {
+fun AddDateDialog(
+    data: CommemorationDayEntity?,
+    onResult: (data: CommemorationDayEntity) -> Unit,
+    onDismiss: () -> Unit,
+    chooseDate: (onResult: (date: String) -> Unit) -> Unit
+) {
+    val nameValue = remember { mutableStateOf(data?.content ?: "") }
+    val dateValue = remember { mutableStateOf(time2String(data?.date ?: 0)) }
+    Dialog(onDismissRequest = { }) {
         Column(
             modifier = Modifier
                 .width(250.dp)
@@ -38,7 +45,7 @@ fun AddDateDialog(onDismiss: () -> Unit) {
                 .background(colorResource(id = R.color.main_color))
         ) {
             Text(
-                text = stringResource(id = R.string.choose_date),
+                text = stringResource(id = R.string.add_date),
                 modifier = Modifier
                     .padding(top = 28.dp)
                     .fillMaxWidth(),
@@ -57,21 +64,29 @@ fun AddDateDialog(onDismiss: () -> Unit) {
             Card(
                 modifier = Modifier
                     .padding(top = 14.dp, start = 14.dp, end = 20.dp)
-                    .background(colorResource(id = R.color.white))
                     .fillMaxWidth()
                     .height(40.dp),
                 shape = RoundedCornerShape(8.dp)
             ) {
-                Text(
-                    text = stringResource(id = R.string.choose_date),
+                Box(
                     modifier = Modifier
+                        .background(colorResource(id = R.color.white))
                         .fillMaxWidth()
                         .fillMaxHeight()
-                        .align(Alignment.CenterHorizontally),
-                    textAlign = TextAlign.Center,
-                    color = colorResource(id = R.color.black),
-                    fontSize = 12.sp,
-                )
+                        .noAnimClick {
+                            chooseDate {
+                                dateValue.value = it
+                            }
+                        },
+                    contentAlignment = Alignment.Center
+                ) {
+                    Text(
+                        text = if (dateValue.value == "") stringResource(id = R.string.choose_date) else dateValue.value,
+                        textAlign = TextAlign.Center,
+                        color = colorResource(id = R.color.black),
+                        fontSize = 12.sp,
+                    )
+                }
             }
             Text(
                 text = stringResource(id = R.string.thing),
@@ -81,25 +96,36 @@ fun AddDateDialog(onDismiss: () -> Unit) {
                 color = colorResource(id = R.color.black),
                 fontSize = 14.sp
             )
-            TextField(
-                value = "",
-                onValueChange = {},
+            Box(
+                contentAlignment = Alignment.CenterStart,
                 modifier = Modifier
                     .fillMaxWidth()
-                    .height(40.dp)
                     .padding(top = 20.dp, start = 20.dp, end = 20.dp)
+                    .height(40.dp)
                     .clip(RoundedCornerShape(8.dp))
                     .background(colorResource(id = R.color.white))
-            )
+            ) {
+                BasicTextField(
+                    value = nameValue.value,
+                    textStyle = TextStyle(
+                        fontSize = 14.sp,
+                        color = colorResource(id = R.color.black)
+                    ),
+                    onValueChange = { nameValue.value = it },
+                    singleLine = true,
+                    modifier = Modifier
+                        .padding(start = 10.dp, end = 10.dp)
+                        .fillMaxWidth()
+                )
+            }
             Box(modifier = Modifier.weight(1f, true))
             Row(
                 modifier = Modifier
                     .height(55.dp)
                     .fillMaxWidth()
             ) {
-                Text(
-                    text = stringResource(id = R.string.cancel),
-                    textAlign = TextAlign.Center,
+                Box(
+                    contentAlignment = Alignment.Center,
                     modifier = Modifier
                         .weight(1f, true)
                         .fillMaxHeight()
@@ -107,10 +133,14 @@ fun AddDateDialog(onDismiss: () -> Unit) {
                             RoundedCornerShape(bottomStart = 12.dp)
                         )
                         .background(colorResource(id = R.color.color_EC928E))
-                )
-                Text(
-                    text = stringResource(id = R.string.ok),
-                    textAlign = TextAlign.Center,
+                        .noAnimClick {
+                            onDismiss()
+                        }
+                ) {
+                    Text(text = stringResource(id = R.string.cancel))
+                }
+                Box(
+                    contentAlignment = Alignment.Center,
                     modifier = Modifier
                         .weight(1f, true)
                         .fillMaxHeight()
@@ -118,38 +148,27 @@ fun AddDateDialog(onDismiss: () -> Unit) {
                             RoundedCornerShape(bottomEnd = 12.dp)
                         )
                         .background(colorResource(id = R.color.color_E46962))
-                )
+                        .noAnimClick {
+                            data?.let {
+                                //更新
+                                data.date = string2Time(dateValue.value)
+                                data.content = nameValue.value
+                                onResult(data)
+                                return@noAnimClick
+                            }
+
+                            onResult(
+                                CommemorationDayEntity(
+                                    nameValue.value,
+                                    string2Time(dateValue.value),
+                                    showInDesktop = false
+                                )
+                            )
+                        }
+                ) {
+                    Text(text = stringResource(id = R.string.ok))
+                }
             }
         }
     }
 }
-
-//class AddDateDialog(context:Context): Dialog(context,R.style.CommonDialog) {
-//
-//    private val mChooseDate:View
-//    private val mTvDate:TextView
-//    private val mTvOk:TextView
-//    private val mTvCancel:TextView
-//    private val mEtName:EditText
-//
-//    init {
-//        setContentView(R.layout.dialog_add_data)
-//        mChooseDate = findViewById(R.id.card_choose_date)
-//        mTvDate = findViewById(R.id.tv_choose_date)
-//        mTvOk = findViewById(R.id.tv_ok)
-//        mTvCancel = findViewById(R.id.tv_cancel)
-//        mEtName = findViewById(R.id.et_name)
-//
-//        mChooseDate.setOnClickListener{
-//
-//        }
-//
-//        mTvOk.setOnClickListener {
-//
-//        }
-//        mTvCancel.setOnClickListener {
-//            dismiss()
-//        }
-//    }
-//
-//}

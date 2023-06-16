@@ -9,7 +9,6 @@ class HomeFragment: BaseFragment<HomeViewModel>() {
 
     @Composable
     override fun InitComposeView(){
-        DatePickerView("日期选择")
     }
 
 }
