@@ -19,10 +19,10 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.viewinterop.AndroidView
 import androidx.compose.ui.zIndex
 import androidx.constraintlayout.compose.ConstraintLayout
-import androidx.fragment.app.Fragment
 import com.zhpew.meandstar.base.BaseActivity
 import com.zhpew.meandstar.vm.MainViewModel
 import com.zhpew.meandstar.R
+import com.zhpew.meandstar.base.BaseFragment
 import com.zhpew.meandstar.fragment.DateFragment
 import com.zhpew.meandstar.fragment.DiaryFragment
 import com.zhpew.meandstar.fragment.HomeFragment
@@ -36,7 +36,7 @@ class MainActivity : BaseActivity<MainViewModel>() {
     private val diaryFragment = DiaryFragment()
     private val dateFragment = DateFragment()
 
-    private val fragments = HashMap<Int, Fragment>()
+    private val fragments = HashMap<Int, BaseFragment<*>>()
 
     @Composable
     override fun InitComposeView() {
@@ -64,7 +64,7 @@ class MainActivity : BaseActivity<MainViewModel>() {
                 )
                 if(mSelectedPage.value != 0 && mSelectedPage.value !=1){
                     FloatingActionButton(onClick = {
-
+                        fragments[mSelectedPage.value]?.onFABClick()
                     }, backgroundColor = colorResource(id = R.color.color_E46962),
                         modifier = Modifier
                             .constrainAs(flb) {

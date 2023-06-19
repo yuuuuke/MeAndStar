@@ -1,5 +1,6 @@
 package com.zhpew.meandstar.widget
 
+import android.annotation.SuppressLint
 import android.util.Log
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
@@ -27,6 +28,10 @@ import com.zhpew.meandstar.utils.noAnimClick
 import com.zhpew.meandstar.utils.string2Time
 import com.zhpew.meandstar.utils.time2String
 
+val nameValue = mutableStateOf( "")
+val dateValue = mutableStateOf( 0L)
+
+@SuppressLint("UnrememberedMutableState")
 @Composable
 fun AddDateDialog(
     data: CommemorationDayEntity?,
@@ -34,8 +39,8 @@ fun AddDateDialog(
     onDismiss: () -> Unit,
     chooseDate: (onResult: (date: String) -> Unit) -> Unit
 ) {
-    val nameValue = remember { mutableStateOf(data?.content ?: "") }
-    val dateValue = remember { mutableStateOf(time2String(data?.date ?: 0)) }
+    nameValue.value = data?.content?:""
+    dateValue.value = data?.date?:0
     Dialog(onDismissRequest = { }) {
         Column(
             modifier = Modifier
@@ -75,13 +80,13 @@ fun AddDateDialog(
                         .fillMaxHeight()
                         .noAnimClick {
                             chooseDate {
-                                dateValue.value = it
+                                dateValue.value = it.toLong()
                             }
                         },
                     contentAlignment = Alignment.Center
                 ) {
                     Text(
-                        text = if (dateValue.value == "") stringResource(id = R.string.choose_date) else dateValue.value,
+                        text = if (dateValue.value == 0L) stringResource(id = R.string.choose_date) else time2String(dateValue.value),
                         textAlign = TextAlign.Center,
                         color = colorResource(id = R.color.black),
                         fontSize = 12.sp,
@@ -151,7 +156,7 @@ fun AddDateDialog(
                         .noAnimClick {
                             data?.let {
                                 //更新
-                                data.date = string2Time(dateValue.value)
+                                data.date = dateValue.value
                                 data.content = nameValue.value
                                 onResult(data)
                                 return@noAnimClick
@@ -160,8 +165,7 @@ fun AddDateDialog(
                             onResult(
                                 CommemorationDayEntity(
                                     nameValue.value,
-                                    string2Time(dateValue.value),
-                                    showInDesktop = false
+                                    dateValue.value,
                                 )
                             )
                         }

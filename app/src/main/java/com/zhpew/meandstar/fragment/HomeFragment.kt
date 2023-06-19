@@ -11,4 +11,8 @@ class HomeFragment: BaseFragment<HomeViewModel>() {
     override fun InitComposeView(){
     }
 
+    override fun onFABClick() {
+        TODO("Not yet implemented")
+    }
+
 }

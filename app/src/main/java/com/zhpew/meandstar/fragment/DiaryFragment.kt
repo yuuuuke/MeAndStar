@@ -47,6 +47,10 @@ class DiaryFragment : BaseFragment<DiaryListViewModel>() {
         }
     }
 
+    override fun onFABClick() {
+        TODO("Not yet implemented")
+    }
+
     @Composable
     private fun ListData() {
         LazyColumn(modifier = Modifier

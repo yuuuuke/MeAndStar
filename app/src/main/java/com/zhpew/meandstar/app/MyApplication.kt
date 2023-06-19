@@ -4,7 +4,7 @@ import android.app.Application
 
 class MyApplication : Application() {
     companion object {
-        lateinit var instance: Application
+        lateinit var instance: MyApplication
     }
 
     val repository:DbRepository = DbRepository(this)

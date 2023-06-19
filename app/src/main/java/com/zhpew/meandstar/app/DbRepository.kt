@@ -12,5 +12,5 @@ class DbRepository(context:Context) {
     }
 
     // 数据库表
-    val repository by lazy { CommemorationRepository(DB.CommemorationDao()) }
+    val commemorationRepository by lazy { CommemorationRepository(DB.CommemorationDao()) }
 }
