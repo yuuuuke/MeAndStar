@@ -39,7 +39,7 @@ fun longToDatePickerState(l: Long): DatePickerState? {
         val sdf = SimpleDateFormat("yyyy-MM-dd", Locale.getDefault())
         val dateStr = sdf.format(Date(l))
         DatePickerState(dateStr.split("-")[0], dateStr.split("-")[1], dateStr.split("-")[2])
-    }catch (e:java.lang.Exception){
+    } catch (e: java.lang.Exception) {
         null
     }
 }
@@ -65,9 +65,9 @@ fun DatePickerView(
     date?.let {
         state = date
     }
-    val year = date?.year ?: years[Calendar.getInstance().get(Calendar.YEAR) - 1950]
-    val month = date?.month ?: monthsNames[Calendar.getInstance().get(Calendar.MONTH) - 1]
-    val day = date?.day ?: currentMonth.value[Calendar.getInstance().get(Calendar.DAY_OF_MONTH) - 1]
+    val year = date?.year ?: years[Calendar.getInstance().get(Calendar.YEAR) - 1949]
+    val month = date?.month ?: monthsNames[Calendar.getInstance().get(Calendar.MONTH) +1]
+    val day = date?.day ?: currentMonth.value[Calendar.getInstance().get(Calendar.DAY_OF_MONTH)]
 
     state = DatePickerState(year, month, day)
 
@@ -94,12 +94,12 @@ fun DatePickerView(
                 .height(120.dp),
             horizontalArrangement = Arrangement.SpaceAround
         ) {
-            SelectedItem(data = years, year.toInt() - 1949) {
+            SelectedItem(data = years, year.toInt() - 1950) {
                 dateStateListener(state.apply {
                     this.year = it
                 })
             }
-            SelectedItem(data = monthsNames, month.toInt() + 1) {
+            SelectedItem(data = monthsNames, month.toInt() - 1) {
                 if (it == "1" || it == "3" || it == "5" || it == "7" || it == "8" || it == "10" || it == "12") {
                     // 31 天月
                     currentMonth.value = days31
@@ -139,7 +139,7 @@ fun DatePickerView(
             }
             SelectedItem(
                 data = currentMonth.value,
-                day.toInt()
+                day.toInt() - 1
             ) {
                 dateStateListener(state.apply {
                     this.day = it

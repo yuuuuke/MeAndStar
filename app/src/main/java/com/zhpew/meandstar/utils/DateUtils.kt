@@ -1,8 +1,12 @@
 package com.zhpew.meandstar.utils
 
+import androidx.compose.ui.res.stringResource
+import com.zhpew.meandstar.R
+import com.zhpew.meandstar.app.MyApplication
 import java.text.DateFormat
 import java.text.SimpleDateFormat
 import java.util.*
+import java.util.Calendar.*
 
 /**
  * 时间戳转字符串
@@ -22,5 +26,19 @@ fun string2Time(time: String): Long {
         date?.time ?: 0
     } catch (e: java.lang.Exception) {
         0
+    }
+}
+
+fun getWeekOfDate(time: Long):String{
+    val cal = Calendar.getInstance();
+    cal.time = Date(time);
+    return when(cal.get(Calendar.DAY_OF_WEEK)){
+        MONDAY -> MyApplication.instance.resources.getString(R.string.Monday)
+        TUESDAY -> MyApplication.instance.resources.getString(R.string.Tuesday)
+        WEDNESDAY -> MyApplication.instance.resources.getString(R.string.Wednesday)
+        THURSDAY -> MyApplication.instance.resources.getString(R.string.Thursday)
+        FRIDAY -> MyApplication.instance.resources.getString(R.string.Friday)
+        SATURDAY -> MyApplication.instance.resources.getString(R.string.Saturday)
+        else -> MyApplication.instance.resources.getString(R.string.Sunday)
     }
 }

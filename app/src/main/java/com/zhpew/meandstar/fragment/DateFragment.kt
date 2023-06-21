@@ -11,6 +11,7 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.Card
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -24,28 +25,38 @@ import androidx.compose.ui.window.Dialog
 import com.zhpew.meandstar.R
 import com.zhpew.meandstar.base.BaseFragment
 import com.zhpew.meandstar.db.dbEntity.CommemorationDayEntity
+import com.zhpew.meandstar.utils.getWeekOfDate
 import com.zhpew.meandstar.utils.noAnimClick
+import com.zhpew.meandstar.utils.time2String
 import com.zhpew.meandstar.vm.DateViewModel
+import com.zhpew.meandstar.vm.UiState
 import com.zhpew.meandstar.widget.AddDateDialog
 import com.zhpew.meandstar.widget.DatePickerState
 import com.zhpew.meandstar.widget.DatePickerView
 import com.zhpew.meandstar.widget.longToDatePickerState
+import kotlin.math.abs
+import kotlin.math.ceil
 
 /**
  * 纪念日
  */
 class DateFragment : BaseFragment<DateViewModel>() {
 
+    companion object {
+        const val ONE_DAY = 24 * 60 * 60 * 1000L
+    }
+
+    private val currentTime = System.currentTimeMillis()
     private val showAddDataDialog = mutableStateOf(false)
     private val showDatePicker = mutableStateOf(false)
 
     private var clickedItem = mutableStateOf<CommemorationDayEntity?>(null)
 
-    private var mHeaderData = mutableStateOf<CommemorationDayEntity?>(null)
-    private var mListData = mutableStateOf<ArrayList<CommemorationDayEntity>>(ArrayList(10))
-
     @Composable
     override fun InitComposeView() {
+
+        val uiState = vm.uiState
+
         Column(
             Modifier
                 .fillMaxWidth()
@@ -67,10 +78,10 @@ class DateFragment : BaseFragment<DateViewModel>() {
             ) {
                 Text(text = "纪念日", color = colorResource(id = R.color.text_color), fontSize = 18.sp)
             }
-            mHeaderData.value?.let {
-                HeaderView()
+            uiState.value.headerData?.let {
+                HeaderView(uiState)
             }
-            ListData()
+            ListData(uiState)
 
             AddDate()
             DatePicker()
@@ -78,7 +89,7 @@ class DateFragment : BaseFragment<DateViewModel>() {
     }
 
     @Composable
-    private fun HeaderView() {
+    private fun HeaderView(uiState: MutableState<UiState>) {
         Row(
             modifier = Modifier
                 .background(colorResource(id = R.color.main_color))
@@ -89,13 +100,13 @@ class DateFragment : BaseFragment<DateViewModel>() {
             Column() {
                 Text(
                     modifier = Modifier.padding(bottom = 5.dp),
-                    text = "那一天已经",
+                    text = if (uiState.value.headerData!!.date > currentTime) uiState.value.headerData!!.content + "还有" else uiState.value.headerData!!.content + "已经",
                     fontSize = 16.sp,
                     fontWeight = FontWeight.Bold,
                     color = colorResource(id = R.color.black)
                 )
                 Text(
-                    text = "起始日: 2020-08-08 星期六",
+                    text = "起始日: ${time2String(uiState.value.headerData!!.date)} ${getWeekOfDate(uiState.value.headerData!!.date)}",
                     fontSize = 14.sp,
                     color = colorResource(id = R.color.sub_text_color)
                 )
@@ -109,7 +120,8 @@ class DateFragment : BaseFragment<DateViewModel>() {
             ) {
                 Text(
                     modifier = Modifier.padding(end = 5.dp),
-                    text = "600",
+                    text = ceil((abs(uiState.value.headerData!!.date - currentTime)) / ONE_DAY.toDouble()).toInt()
+                        .toString(),
                     color = colorResource(id = R.color.text_color),
                     fontSize = 32.sp,
                     fontWeight = FontWeight.Bold
@@ -125,9 +137,9 @@ class DateFragment : BaseFragment<DateViewModel>() {
     }
 
     @Composable
-    private fun ListData() {
+    private fun ListData(uiState: MutableState<UiState>) {
         LazyColumn(content = {
-            items(mListData.value.size) { it ->
+            items(uiState.value.data.size) { it ->
                 if (it == 0) {
                     Box(modifier = Modifier.height(8.dp)) {}
                 }
@@ -141,14 +153,8 @@ class DateFragment : BaseFragment<DateViewModel>() {
                         .fillMaxWidth()
                         .noAnimClick {
                             showAddDataDialog.value = true
-                            clickedItem.value = mListData.value[it]
+                            clickedItem.value = uiState.value.data[it]
                         }
-                        .pointerInput(this) {
-                            detectTapGestures(onLongPress = {
-
-                            })
-                        }
-
                 ) {
                     Row(
                         verticalAlignment = Alignment.CenterVertically,
@@ -160,7 +166,7 @@ class DateFragment : BaseFragment<DateViewModel>() {
                             modifier = Modifier
                                 .padding(start = 15.dp)
                                 .weight(1f),
-                            text = mListData.value[it].content,
+                            text = if (uiState.value.data[it].date > currentTime) uiState.value.data[it].content + "还有" else uiState.value.data[it].content + "已经",
                             fontSize = 14.sp,
                             color = colorResource(id = R.color.black)
                         )
@@ -171,11 +177,12 @@ class DateFragment : BaseFragment<DateViewModel>() {
                                 .width(74.dp)
                                 .fillMaxHeight()
                                 .background(
-                                    colorResource(id = R.color.color_26AA89)
+                                    colorResource(id = if (uiState.value.data[it].date > currentTime) R.color.color_26AA89 else R.color.color_E46962)
                                 )
                         ) {
                             Text(
-                                text = mListData.value[it].date.toString(),
+                                text = ceil((abs(uiState.value.data[it].date - currentTime)) / ONE_DAY.toDouble()).toInt()
+                                    .toString(),
                             )
                         }
                         Row(
@@ -185,7 +192,7 @@ class DateFragment : BaseFragment<DateViewModel>() {
                                 .width(52.dp)
                                 .fillMaxHeight()
                                 .background(
-                                    colorResource(id = R.color.color_22856C)
+                                    colorResource(id = if (uiState.value.data[it].date > currentTime) R.color.color_22856C else R.color.color_B63028)
                                 )
                         ) {
                             Text(
@@ -203,6 +210,7 @@ class DateFragment : BaseFragment<DateViewModel>() {
     private fun AddDate() {
         if (showAddDataDialog.value) {
             AddDateDialog(clickedItem.value, {
+                Log.v("zwp", "更换！！" + it.toString() + it.id)
                 vm.updateOrInsertData(it)
                 clickedItem.value!!.date
                 showAddDataDialog.value = false
@@ -219,12 +227,15 @@ class DateFragment : BaseFragment<DateViewModel>() {
     private fun DatePicker() {
         if (showDatePicker.value) {
             var state: DatePickerState? = null
-            Dialog(onDismissRequest = { showDatePicker.value = false
+            Dialog(onDismissRequest = {
+                showDatePicker.value = false
                 if (clickedItem.value == null) {
                     clickedItem.value =
                         CommemorationDayEntity(content = "", date = state!!.toLong())
                 } else {
+                    Log.v("zwp","clickedItem.value"+clickedItem.value!!.id)
                     clickedItem.value = clickedItem.value!!.copy(date = state!!.toLong())
+                    Log.v("zwp", "///" + clickedItem.value!!.id)
                 }
             }) {
                 Card(
@@ -252,13 +263,5 @@ class DateFragment : BaseFragment<DateViewModel>() {
     override fun onFABClick() {
         showAddDataDialog.value = true
         clickedItem.value = null
-    }
-
-    override suspend fun initData(){
-        vm.getAllData()
-        vm.allDataFlow.collect{
-            mListData.value = it
-            Log.v("zwp",it.size.toString())
-        }
     }
 }

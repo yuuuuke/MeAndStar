@@ -6,4 +6,12 @@
     <string name="thing">事务</string>
     <string name="cancel">取消</string>
     <string name="ok">确定</string>
+
+    <string name="Monday">星期一</string>
+    <string name="Tuesday">星期二</string>
+    <string name="Wednesday">星期三</string>
+    <string name="Thursday">星期四</string>
+    <string name="Friday">星期五</string>
+    <string name="Saturday">星期六</string>
+    <string name="Sunday">星期日</string>
 </resources>

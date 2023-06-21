@@ -13,7 +13,7 @@ import com.zhpew.meandstar.db.dbEntity.CommemorationDayEntity
 
 @Dao
 interface CommemorationDAO {
-    @Query("SELECT * FROM table_commemoration")
+    @Query("SELECT * FROM table_commemoration order by date desc")
     suspend fun getAllData(): List<CommemorationDayEntity>
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)

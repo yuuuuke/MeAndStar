@@ -25,7 +25,6 @@ import androidx.compose.ui.window.Dialog
 import com.zhpew.meandstar.R
 import com.zhpew.meandstar.db.dbEntity.CommemorationDayEntity
 import com.zhpew.meandstar.utils.noAnimClick
-import com.zhpew.meandstar.utils.string2Time
 import com.zhpew.meandstar.utils.time2String
 
 val nameValue = mutableStateOf( "")
@@ -39,6 +38,7 @@ fun AddDateDialog(
     onDismiss: () -> Unit,
     chooseDate: (onResult: (date: String) -> Unit) -> Unit
 ) {
+    Log.v("zwp","in + ${data?.id}")
     nameValue.value = data?.content?:""
     dateValue.value = data?.date?:0
     Dialog(onDismissRequest = { }) {
