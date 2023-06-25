@@ -17,6 +17,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.zhpew.meandstar.R
 import com.zhpew.meandstar.base.BaseFragment
+import com.zhpew.meandstar.utils.noAnimClick
 import com.zhpew.meandstar.vm.DiaryListViewModel
 
 class DiaryFragment : BaseFragment<DiaryListViewModel>() {
@@ -48,7 +49,7 @@ class DiaryFragment : BaseFragment<DiaryListViewModel>() {
     }
 
     override fun onFABClick() {
-        TODO("Not yet implemented")
+        // 写日记
     }
 
     @Composable
@@ -65,7 +66,10 @@ class DiaryFragment : BaseFragment<DiaryListViewModel>() {
 
     @Composable
     private fun Item() {
-        Row(modifier = Modifier.padding(horizontal = 16.dp, vertical = 8.dp)) {
+        Row(modifier = Modifier.padding(horizontal = 16.dp, vertical = 8.dp).noAnimClick {
+            // 编辑日记
+
+        }) {
             Column(verticalArrangement = Arrangement.Bottom, modifier = Modifier
                 .padding(end = 16.dp)
                 .height(100.dp)) {

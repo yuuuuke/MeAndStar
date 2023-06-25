@@ -14,7 +14,7 @@ import kotlinx.coroutines.launch
 
 class DateViewModel : BaseViewModel() {
 
-    val uiState: MutableState<UiState> = mutableStateOf(UiState())
+    val uiState: MutableState<DateUiState> = mutableStateOf(DateUiState())
 
     private val repository by lazy {
         MyApplication.instance.repository.commemorationRepository
@@ -84,7 +84,7 @@ class DateViewModel : BaseViewModel() {
     }
 }
 
-data class UiState(
+data class DateUiState(
     val data: SnapshotStateList<CommemorationDayEntity> = mutableStateListOf(),
     val headerData: CommemorationDayEntity? = null
 )

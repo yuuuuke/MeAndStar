@@ -1,16 +1,18 @@
 package com.zhpew.meandstar.db
 
 import android.content.Context
-import androidx.room.Database
-import androidx.room.Room
-import androidx.room.RoomDatabase
+import androidx.room.*
 import com.zhpew.meandstar.db.dbDao.CommemorationDAO
+import com.zhpew.meandstar.db.dbDao.DiaryDAO
 import com.zhpew.meandstar.db.dbEntity.CommemorationDayEntity
+import com.zhpew.meandstar.db.dbEntity.DiaryEntity
 
-@Database(entities = arrayOf(CommemorationDayEntity::class), version = 1, exportSchema = false)
+@Database(entities = arrayOf(CommemorationDayEntity::class,DiaryEntity::class), version = 1, exportSchema = false)
+@TypeConverters(CustomConverter::class)
 public abstract class StarRoomDatabase : RoomDatabase() {
 
     abstract fun CommemorationDao(): CommemorationDAO
+    abstract fun DiaryDAO(): DiaryDAO
 
     companion object {
 

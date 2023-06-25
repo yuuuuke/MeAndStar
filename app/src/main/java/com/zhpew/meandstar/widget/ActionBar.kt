@@ -2,8 +2,6 @@ package com.zhpew.meandstar.widget
 
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
-import androidx.compose.foundation.clickable
-import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.*
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
@@ -17,7 +15,7 @@ import com.zhpew.meandstar.R
 import com.zhpew.meandstar.utils.noAnimClick
 
 @Composable
-fun ActionBar(title: String, onBackPress: () -> Unit) {
+fun CustomActionBar(title: String, onBackPress: () -> Unit) {
     Box(
         Modifier
             .fillMaxWidth()

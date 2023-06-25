@@ -1,10 +1,7 @@
 package com.zhpew.meandstar.fragment
 
-import android.annotation.SuppressLint
 import android.util.Log
 import androidx.compose.foundation.background
-import androidx.compose.foundation.clickable
-import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -15,8 +12,6 @@ import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.input.key.onKeyEvent
-import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
@@ -29,7 +24,7 @@ import com.zhpew.meandstar.utils.getWeekOfDate
 import com.zhpew.meandstar.utils.noAnimClick
 import com.zhpew.meandstar.utils.time2String
 import com.zhpew.meandstar.vm.DateViewModel
-import com.zhpew.meandstar.vm.UiState
+import com.zhpew.meandstar.vm.DateUiState
 import com.zhpew.meandstar.widget.AddDateDialog
 import com.zhpew.meandstar.widget.DatePickerState
 import com.zhpew.meandstar.widget.DatePickerView
@@ -89,7 +84,7 @@ class DateFragment : BaseFragment<DateViewModel>() {
     }
 
     @Composable
-    private fun HeaderView(uiState: MutableState<UiState>) {
+    private fun HeaderView(uiState: MutableState<DateUiState>) {
         Row(
             modifier = Modifier
                 .background(colorResource(id = R.color.main_color))
@@ -137,7 +132,7 @@ class DateFragment : BaseFragment<DateViewModel>() {
     }
 
     @Composable
-    private fun ListData(uiState: MutableState<UiState>) {
+    private fun ListData(uiState: MutableState<DateUiState>) {
         LazyColumn(content = {
             items(uiState.value.data.size) { it ->
                 if (it == 0) {

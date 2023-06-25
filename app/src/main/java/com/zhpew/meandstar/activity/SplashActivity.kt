@@ -46,7 +46,8 @@ class SplashActivity : FragmentActivity() {
         Handler().postDelayed({
             val intent = Intent(this,MainActivity::class.java)
             startActivity(intent)
-        },500)
+            finish()
+        },1000)
     }
 
     @Preview
