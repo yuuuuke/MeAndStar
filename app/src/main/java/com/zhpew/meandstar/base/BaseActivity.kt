@@ -28,8 +28,8 @@ abstract class BaseActivity<VM : BaseViewModel> : FragmentActivity() {
         } else {
             setContentView(getLayoutId())
         }
-
         vm = initViewModel()
+        initData()
     }
 
     protected fun setStatusBarColor(isBlack:Boolean) {
@@ -51,6 +51,9 @@ abstract class BaseActivity<VM : BaseViewModel> : FragmentActivity() {
         return -1
     }
 
+    open fun initData(){
+
+    }
 
     private fun initViewModel(): VM {
         return ViewModelProvider(this)[(this.javaClass.genericSuperclass as ParameterizedType).actualTypeArguments[0] as Class<VM>]

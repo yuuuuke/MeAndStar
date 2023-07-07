@@ -1,5 +1,8 @@
 package com.zhpew.meandstar.fragment
 
+import android.util.Log
+import androidx.activity.result.PickVisualMediaRequest
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
@@ -16,11 +19,23 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.zhpew.meandstar.R
+import com.zhpew.meandstar.activity.DiaryActivity
+import com.zhpew.meandstar.activity.DiaryEditActivity
 import com.zhpew.meandstar.base.BaseFragment
+import com.zhpew.meandstar.utils.getWeekOfDate
 import com.zhpew.meandstar.utils.noAnimClick
+import com.zhpew.meandstar.utils.time2String
+import com.zhpew.meandstar.vm.DiaryListAction
 import com.zhpew.meandstar.vm.DiaryListViewModel
 
 class DiaryFragment : BaseFragment<DiaryListViewModel>() {
+
+    override suspend fun initData(){
+        vm.dispatch(DiaryListAction.GetAllDiary)
+        vm.viewEvent.collect {
+
+        }
+    }
 
     @Composable
     override fun InitComposeView() {
@@ -33,7 +48,8 @@ class DiaryFragment : BaseFragment<DiaryListViewModel>() {
                 Modifier
                     .fillMaxWidth()
                     .height(24.dp)
-                    .background(colorResource(id = R.color.main_color))) {}
+                    .background(colorResource(id = R.color.main_color))
+            ) {}
             Column(
                 verticalArrangement = Arrangement.Center,
                 horizontalAlignment = Alignment.CenterHorizontally,
@@ -50,6 +66,7 @@ class DiaryFragment : BaseFragment<DiaryListViewModel>() {
 
     override fun onFABClick() {
         // 写日记
+        DiaryEditActivity.startAct(requireContext())
     }
 
     @Composable
@@ -58,24 +75,37 @@ class DiaryFragment : BaseFragment<DiaryListViewModel>() {
             .background(colorResource(id = R.color.bg_color))
             .fillMaxWidth()
             .fillMaxHeight(), content = {
-            items(10) {
-                Item()
+            items(vm.state.value.data.size) {
+                Item(it)
             }
         })
     }
 
     @Composable
-    private fun Item() {
-        Row(modifier = Modifier.padding(horizontal = 16.dp, vertical = 8.dp).noAnimClick {
-            // 编辑日记
-
-        }) {
-            Column(verticalArrangement = Arrangement.Bottom, modifier = Modifier
-                .padding(end = 16.dp)
-                .height(100.dp)) {
-                Text(text = "星期三", color = colorResource(id = R.color.text_color), fontSize = 12.sp)
-                Text(text = "8月24日", color = colorResource(id = R.color.text_color), fontSize = 14.sp)
-                Text(text = "15:00", color = colorResource(id = R.color.text_color), fontSize = 18.sp)
+    private fun Item(index:Int) {
+        val data = vm.state.value.data[index]
+        Row(modifier = Modifier
+            .padding(horizontal = 16.dp, vertical = 8.dp)
+            .noAnimClick {
+                // 进入日记详情
+                DiaryActivity.startAct(this.requireContext(), data.id)
+            }) {
+            Column(
+                verticalArrangement = Arrangement.Bottom, modifier = Modifier
+                    .padding(end = 16.dp)
+                    .height(100.dp)
+            ) {
+                Text(text = getWeekOfDate(data.editTime), color = colorResource(id = R.color.text_color), fontSize = 12.sp)
+                Text(
+                    text = time2String(data.editTime,"MM月dd日"),
+                    color = colorResource(id = R.color.text_color),
+                    fontSize = 14.sp
+                )
+                Text(
+                    text = time2String(data.editTime,"HH:mm"),
+                    color = colorResource(id = R.color.text_color),
+                    fontSize = 18.sp
+                )
             }
             Column(
                 modifier = Modifier
@@ -86,11 +116,20 @@ class DiaryFragment : BaseFragment<DiaryListViewModel>() {
                     .padding(10.dp)
             ) {
                 Text(
-                    text = "在数据持久上使用了Room数据库，使用DataStore存放一些不是很重要的数据，没有架设服务器。在使用Room的时候遇到了比较多的坑，并且网上常见的教程都是关于简单使用，场景一旦复杂就没什么教程了，之后有时间会写一之后有时间会写一之后有时间会写一之后有时间会写一期说说。",
+                    text = data.title,
+                    color = colorResource(id = R.color.text_color),
+                    maxLines = 1,
+                    fontSize = 13.sp,
+                    lineHeight = 15.sp,
+                    overflow = TextOverflow.Ellipsis
+                )
+
+                Text(
+                    text = data.textContent,
                     color = colorResource(id = R.color.text_color),
                     fontSize = 12.sp,
                     lineHeight = 15.sp,
-                    overflow= TextOverflow.Ellipsis
+                    overflow = TextOverflow.Ellipsis
                 )
             }
         }

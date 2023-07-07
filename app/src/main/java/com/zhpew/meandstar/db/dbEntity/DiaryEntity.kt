@@ -10,6 +10,6 @@ data class DiaryEntity(
     var editTime: Long,
     var title:String,
     var textContent: String,
-    var bg: String,
-    var images: ArrayList<String>
+    var bg: String?,
+    var images: ArrayList<String>?
 )

@@ -1,11 +1,13 @@
 package com.zhpew.meandstar.widget
 
+import android.util.Log
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.painter.Painter
 import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
@@ -15,7 +17,12 @@ import com.zhpew.meandstar.R
 import com.zhpew.meandstar.utils.noAnimClick
 
 @Composable
-fun CustomActionBar(title: String, onBackPress: () -> Unit) {
+fun CustomActionBar(
+    title: String,
+    rightImg: Painter? = null,
+    onBackPress: () -> Unit,
+    rightIconPress: (() -> Unit)? = null
+) {
     Box(
         Modifier
             .fillMaxWidth()
@@ -30,7 +37,7 @@ fun CustomActionBar(title: String, onBackPress: () -> Unit) {
                 colorResource(id = R.color.main_color)
             )
     ) {
-        val (status,titleText, backImg) = createRefs()
+        val (nextImg, titleText, backImg) = createRefs()
         Text(text = title,
             fontSize = 15.sp,
             modifier = Modifier.constrainAs(titleText) {
@@ -55,5 +62,22 @@ fun CustomActionBar(title: String, onBackPress: () -> Unit) {
                     onBackPress()
                 }
         )
+        rightImg?.let {
+            Image(
+                painter = rightImg,
+                contentDescription = "",
+                modifier = Modifier
+                    .padding(end = 24.dp)
+                    .width(24.dp)
+                    .height(24.dp)
+                    .constrainAs(nextImg) {
+                        top.linkTo(parent.top)
+                        bottom.linkTo(parent.bottom)
+                        end.linkTo(parent.end)
+                    }
+                    .noAnimClick {
+                        rightIconPress?.invoke()
+                    })
+        }
     }
 }

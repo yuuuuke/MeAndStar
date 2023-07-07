@@ -222,15 +222,14 @@ class DateFragment : BaseFragment<DateViewModel>() {
     private fun DatePicker() {
         if (showDatePicker.value) {
             var state: DatePickerState? = null
-            Dialog(onDismissRequest = {
+            Dialog(
+                onDismissRequest = {
                 showDatePicker.value = false
                 if (clickedItem.value == null) {
                     clickedItem.value =
                         CommemorationDayEntity(content = "", date = state!!.toLong())
                 } else {
-                    Log.v("zwp","clickedItem.value"+clickedItem.value!!.id)
                     clickedItem.value = clickedItem.value!!.copy(date = state!!.toLong())
-                    Log.v("zwp", "///" + clickedItem.value!!.id)
                 }
             }) {
                 Card(

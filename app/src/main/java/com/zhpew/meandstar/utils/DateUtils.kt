@@ -7,15 +7,16 @@ import java.text.DateFormat
 import java.text.SimpleDateFormat
 import java.util.*
 import java.util.Calendar.*
+import java.util.regex.Pattern
 
 /**
  * 时间戳转字符串
  */
-fun time2String(time: Long): String {
+fun time2String(time: Long,pattern:String = "yyyy-MM-dd"): String {
     if (time <= 0) {
         return ""
     }
-    val sdf = SimpleDateFormat("yyyy-MM-dd", Locale.getDefault())
+    val sdf = SimpleDateFormat(pattern, Locale.getDefault())
     return sdf.format(Date(time))
 }
 
