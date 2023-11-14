@@ -24,6 +24,7 @@
 
         <activity
             android:name=".activity.MainActivity"
+            android:launchMode="singleTask"
             android:exported="true"/>
         <activity android:name="com.zhpew.meandstar.activity.DiaryEditActivity" />
         <activity android:name="com.zhpew.meandstar.activity.DiaryActivity" />

@@ -51,6 +51,8 @@ class DiaryEditActivity : BaseActivity<DateEditViewModel>() {
 
     lateinit var picker: ActivityResultLauncher<PickVisualMediaRequest>
     val data = mutableStateOf<DiaryEntity?>(null)
+    val title = mutableStateOf<String>( "")
+    val content = mutableStateOf<String>("")
 
     override fun initData() {
         picker = registerForActivityResult(ActivityResultContracts.PickMultipleVisualMedia(5)) {
@@ -66,6 +68,8 @@ class DiaryEditActivity : BaseActivity<DateEditViewModel>() {
             vm.getDiaryById(1)
             vm.diaryLiveData.observe(this) {
                 data.value = it
+                title.value = data.value!!.title
+                content.value = data.value!!.textContent
             }
         } else {
             data.value = DiaryEntity(0, 0, "", "", null, null)
@@ -73,24 +77,31 @@ class DiaryEditActivity : BaseActivity<DateEditViewModel>() {
 
         vm.cuLiveData.observe(this) {
             Toast.makeText(this, "保存成功", Toast.LENGTH_LONG).show()
-            finish()
+            val intent = Intent(this,MainActivity::class.java)
+            startActivity(intent)
         }
     }
 
     @OptIn(ExperimentalGlideComposeApi::class)
     @Composable
     override fun InitComposeView() {
-        val title = remember {
-            mutableStateOf<String>(data.value?.title ?: "")
-        }
-        val content = remember {
-            mutableStateOf<String>(data.value?.textContent ?: "")
-        }
 
+        val height = remember {
+            mutableStateOf(-1)
+        }
         Column(
             modifier = Modifier
                 .fillMaxWidth()
                 .fillMaxHeight()
+                .layout { measurable, constraints ->
+                    val placeable = measurable.measure(constraints)
+                    layout(placeable.width, placeable.height) {
+                        if (height.value == -1) {
+                            height.value = (placeable.width / 3).Go2Dp
+                        }
+                        placeable.placeRelative(0, 0)
+                    }
+                }
         ) {
             CustomActionBar(
                 title = "",
@@ -102,22 +113,10 @@ class DiaryEditActivity : BaseActivity<DateEditViewModel>() {
                     data.value!!.editTime = System.currentTimeMillis()
                     vm.updateOrCreateData(data.value!!)
                 })
-            val height = remember {
-                mutableStateOf(-1)
-            }
             data.value?.let {
                 LazyVerticalGrid(
                     modifier = Modifier
-                        .fillMaxWidth()
-                        .layout { measurable, constraints ->
-                            val placeable = measurable.measure(constraints)
-                            layout(placeable.width, placeable.height) {
-                                if (height.value == -1) {
-                                    height.value = (placeable.width / 3).Go2Dp
-                                }
-                                placeable.placeRelative(0, 0)
-                            }
-                        },
+                        .fillMaxWidth(),
                     columns = GridCells.Fixed(3),
                     content = {
                         item(span = { GridItemSpan(3) }) {
@@ -125,18 +124,20 @@ class DiaryEditActivity : BaseActivity<DateEditViewModel>() {
                                 BasicTextField(
                                     value = title.value,
                                     onValueChange = { title.value = it },
-                                    modifier = Modifier.padding(top = 15.dp, start = 20.dp),
+                                    modifier = Modifier
+                                        .padding(top = 15.dp, start = 20.dp)
+                                        .fillMaxWidth(),
                                     singleLine = true,
                                     textStyle = TextStyle(
                                         fontSize = 16.sp,
-                                        color = colorResource(id = R.color.teal_200)
+                                        color = colorResource(id = R.color.text_color)
                                     )
                                 )
                                 Box(
                                     modifier = Modifier
                                         .fillMaxWidth()
-                                        .padding(top = 10.dp)
-                                        .background(colorResource(id = R.color.color_B63028))
+                                        .padding(top = 10.dp, start = 15.dp, end = 15.dp)
+                                        .background(colorResource(id = R.color.color_26AA89))
                                         .height(1.dp)
                                 )
                                 BasicTextField(

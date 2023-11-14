@@ -21,6 +21,7 @@ abstract class BaseActivity<VM : BaseViewModel> : FragmentActivity() {
         val option = View.SYSTEM_UI_FLAG_LAYOUT_STABLE or View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN
         window.decorView.systemUiVisibility = option or View.SYSTEM_UI_FLAG_LIGHT_STATUS_BAR
 
+        vm = initViewModel()
         if (getLayoutId() == -1) {
             setContent {
                 InitComposeView()
@@ -28,7 +29,6 @@ abstract class BaseActivity<VM : BaseViewModel> : FragmentActivity() {
         } else {
             setContentView(getLayoutId())
         }
-        vm = initViewModel()
         initData()
     }
 

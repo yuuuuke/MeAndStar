@@ -53,5 +53,7 @@ abstract class BaseFragment<T : BaseViewModel> : Fragment() {
         return -1
     }
 
-    abstract fun onFABClick()
+    open fun onFABClick(){
+
+    }
 }
