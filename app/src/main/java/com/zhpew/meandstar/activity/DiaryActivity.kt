@@ -25,8 +25,8 @@ import com.bumptech.glide.integration.compose.GlideImage
 import com.zhpew.meandstar.R
 import com.zhpew.meandstar.base.BaseActivity
 import com.zhpew.meandstar.db.dbEntity.DiaryEntity
-import com.zhpew.meandstar.utils.Go2Dp
-import com.zhpew.meandstar.utils.noAnimClick
+import com.zhpew.meandstar.ext.Go2Dp
+import com.zhpew.meandstar.ext.noAnimClick
 import com.zhpew.meandstar.vm.DiaryViewModel
 import com.zhpew.meandstar.widget.CustomActionBar
 
@@ -118,20 +118,20 @@ class DiaryActivity : BaseActivity<DiaryViewModel>() {
                             }
                         }
 
-                        items(it.images?.size ?: 0) { index ->
-                            GlideImage(
-                                modifier = Modifier
-                                    .height(height.value.dp)
-                                    .padding(10.dp)
-                                    .clip(RoundedCornerShape(10.dp))
-                                    .noAnimClick {
-
-                                    },
-                                model = it.images?.get(index),
-                                contentDescription = "",
-                                contentScale = ContentScale.Crop
-                            )
-                        }
+//                        items(it.images?.size ?: 0) { index ->
+//                            GlideImage(
+//                                modifier = Modifier
+//                                    .height(height.value.dp)
+//                                    .padding(10.dp)
+//                                    .clip(RoundedCornerShape(10.dp))
+//                                    .noAnimClick {
+//
+//                                    },
+//                                model = it.images?.get(index),
+//                                contentDescription = "",
+//                                contentScale = ContentScale.Crop
+//                            )
+//                        }
                     })
             }
         }

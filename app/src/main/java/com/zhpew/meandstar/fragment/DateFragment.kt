@@ -21,7 +21,7 @@ import com.zhpew.meandstar.R
 import com.zhpew.meandstar.base.BaseFragment
 import com.zhpew.meandstar.db.dbEntity.CommemorationDayEntity
 import com.zhpew.meandstar.utils.getWeekOfDate
-import com.zhpew.meandstar.utils.noAnimClick
+import com.zhpew.meandstar.ext.noAnimClick
 import com.zhpew.meandstar.utils.time2String
 import com.zhpew.meandstar.vm.DateViewModel
 import com.zhpew.meandstar.vm.DateUiState

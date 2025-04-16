@@ -7,11 +7,9 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.BasicTextField
 import androidx.compose.material3.Card
-import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -24,7 +22,7 @@ import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Dialog
 import com.zhpew.meandstar.R
 import com.zhpew.meandstar.db.dbEntity.CommemorationDayEntity
-import com.zhpew.meandstar.utils.noAnimClick
+import com.zhpew.meandstar.ext.noAnimClick
 import com.zhpew.meandstar.utils.time2String
 
 val nameValue = mutableStateOf( "")

@@ -1,4 +1,4 @@
-package com.zhpew.meandstar.utils
+package com.zhpew.meandstar.ext
 
 import android.annotation.SuppressLint
 import android.util.Log

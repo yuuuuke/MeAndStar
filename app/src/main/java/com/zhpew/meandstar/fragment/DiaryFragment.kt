@@ -1,11 +1,6 @@
 package com.zhpew.meandstar.fragment
 
-import android.util.Log
-import androidx.activity.result.PickVisualMediaRequest
-import androidx.activity.result.contract.ActivityResultContracts
-import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
-import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -23,7 +18,7 @@ import com.zhpew.meandstar.activity.DiaryActivity
 import com.zhpew.meandstar.activity.DiaryEditActivity
 import com.zhpew.meandstar.base.BaseFragment
 import com.zhpew.meandstar.utils.getWeekOfDate
-import com.zhpew.meandstar.utils.noAnimClick
+import com.zhpew.meandstar.ext.noAnimClick
 import com.zhpew.meandstar.utils.time2String
 import com.zhpew.meandstar.vm.DiaryListAction
 import com.zhpew.meandstar.vm.DiaryListViewModel
