@@ -1,15 +1,22 @@
 package com.zhpew.imagepickermodule.activity;
 
+import android.Manifest;
 import android.annotation.SuppressLint;
 import android.content.Intent;
+import android.content.pm.PackageManager;
 import android.database.Cursor;
+import android.net.Uri;
 import android.os.Bundle;
 import android.provider.MediaStore;
+import android.provider.Settings;
 import android.util.Log;
 import android.view.View;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.app.ActivityCompat;
+import androidx.core.content.ContextCompat;
 import androidx.loader.app.LoaderManager;
 import androidx.loader.content.Loader;
 import androidx.recyclerview.widget.GridLayoutManager;
@@ -35,14 +42,23 @@ public class SelectPicActivity extends AppCompatActivity implements LoaderManage
     private static final long ONE_HOUR = 60 * 60;
     private static final long ONE_DAY = 24 * ONE_HOUR;
 
+    private static final int REQUEST_PERMISSION = 10086;
+
+
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_select_picture);
         mList = findViewById(R.id.list);
         mAdapter = new PicAdapter();
-        LoaderManager.getInstance(this).initLoader(0, null, this);
-
+        mAdapter.setCount(getIntent().getIntExtra("count", Integer.MAX_VALUE));
+        int needPermission = ContextCompat.checkSelfPermission(SelectPicActivity.this, Manifest.permission.READ_EXTERNAL_STORAGE);
+        if (needPermission == PackageManager.PERMISSION_GRANTED) {
+            LoaderManager.getInstance(this).initLoader(0, null, this);
+        } else {
+            ActivityCompat.requestPermissions(SelectPicActivity.this, new String[]{Manifest.permission.READ_EXTERNAL_STORAGE}, REQUEST_PERMISSION);
+        }
         findViewById(R.id.btn_ok).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -54,7 +70,7 @@ public class SelectPicActivity extends AppCompatActivity implements LoaderManage
                 }
                 Intent intent = new Intent();
                 intent.putExtra(SELECTED_PIC, resultList);
-                setResult(RESULT_OK, intent);
+                setResult(getIntent().getIntExtra("code", -1), intent);
                 finish();
             }
         });
@@ -137,5 +153,28 @@ public class SelectPicActivity extends AppCompatActivity implements LoaderManage
     @Override
     public void onLoaderReset(@NonNull Loader<Cursor> loader) {
 
+    }
+
+    @Override
+    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
+        if (requestCode == REQUEST_PERMISSION) {
+            if (grantResults[0] == PackageManager.PERMISSION_DENIED) {
+                if (!shouldShowRequestPermissionRationale(Manifest.permission.READ_EXTERNAL_STORAGE)) {
+                    Toast.makeText(this, "请去设置打开读取设备存储权限", Toast.LENGTH_SHORT).show();
+                    Intent intent = new Intent();
+                    intent.setAction(Settings.ACTION_APPLICATION_DETAILS_SETTINGS);
+                    intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+                    intent.setData(Uri.parse("package:" + getPackageName()));
+                    startActivity(intent);
+                    finish();
+                } else {
+                    Toast.makeText(this, "读取设备相册需要此权限，请打开此权限", Toast.LENGTH_SHORT).show();
+                    finish();
+                }
+            } else {
+                LoaderManager.getInstance(this).initLoader(0, null, this);
+            }
+        }
     }
 }

@@ -12,7 +12,7 @@ class CustomConverter {
     }
 
     @TypeConverter
-    fun fromArrayList(list:ArrayList<Any>):String{
+    fun fromArrayList(list:ArrayList<String>):String{
         return Gson().toJson(list)
     }
 }

@@ -5,9 +5,16 @@ import android.content.Intent
 import android.widget.Toast
 import androidx.activity.result.ActivityResultLauncher
 import androidx.activity.result.PickVisualMediaRequest
-import androidx.activity.result.contract.ActivityResultContracts
-import androidx.compose.foundation.*
-import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.fillMaxHeight
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.BasicTextField
 import androidx.compose.material3.Text
@@ -27,6 +34,11 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.bumptech.glide.integration.compose.ExperimentalGlideComposeApi
 import com.bumptech.glide.integration.compose.GlideImage
+import com.zhpew.imagepickermodule.REQUEST_CODE
+import com.zhpew.imagepickermodule.Type
+import com.zhpew.imagepickermodule.activity.SelectPicActivity
+import com.zhpew.imagepickermodule.bean.PicItem
+import com.zhpew.imagepickermodule.startPicker
 import com.zhpew.meandstar.R
 import com.zhpew.meandstar.base.BaseActivity
 import com.zhpew.meandstar.db.dbEntity.DiaryItemEntity
@@ -177,23 +189,11 @@ class DiaryEditActivity : BaseActivity<DateEditViewModel>() {
                                 .padding(horizontal = 8.dp)
                                 .noAnimClick {
                                     // 添加一行图片
-                                    picker = registerForActivityResult(
-                                        ActivityResultContracts.PickMultipleVisualMedia(4)
-                                    ) {
-                                        val images = ArrayList<String>()
-                                        images.addAll(it.map { url ->
-                                            url.toString()
-                                        })
-                                        diaryItem.add(
-                                            DiaryItemEntity(
-                                                0,
-                                                "",
-                                                images,
-                                                diaryItem.size
-                                            )
-                                        )
+                                    startPicker {
+                                        context = this@DiaryEditActivity
+                                        maxImage = 3
+                                        type = Type.ALL
                                     }
-                                    picker.launch(PickVisualMediaRequest(ActivityResultContracts.PickVisualMedia.ImageOnly))
                                 }
                         )
                     }
@@ -252,21 +252,42 @@ class DiaryEditActivity : BaseActivity<DateEditViewModel>() {
                         .padding(vertical = 8.dp, horizontal = 14.dp)
                         .clip(RoundedCornerShape(5.dp))
                         .noAnimClick {
-                            picker = registerForActivityResult(
-                                ActivityResultContracts.PickMultipleVisualMedia(
-                                    4 - (item.images?.size ?: 0)
-                                )
-                            ) {
-                                val images = item.images ?: ArrayList()
-                                images.addAll(it.map { url ->
-                                    url.toString()
-                                })
-                                val itemData = diaryItem[item.index]
-                                diaryItem[item.index] = itemData.copy(images = images)
-                            }
-                            picker.launch(PickVisualMediaRequest(ActivityResultContracts.PickVisualMedia.ImageOnly))
+
                         }
                 )
+            }
+        }
+    }
+
+    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
+        super.onActivityResult(requestCode, resultCode, data)
+        if (requestCode == REQUEST_CODE) {
+            val list =
+                data!!.getSerializableExtra(SelectPicActivity.SELECTED_PIC) as ArrayList<PicItem>?
+            if (list?.size == 0) {
+                return
+            }
+            if (resultCode == -1) {
+                val images = ArrayList<String>()
+
+                list?.map { url ->
+                    url.toString()
+                }?.let { images.addAll(it) }
+                diaryItem.add(
+                    DiaryItemEntity(
+                        0,
+                        "",
+                        images,
+                        diaryItem.size
+                    )
+                )
+            } else {
+                val images = diaryItem[resultCode].images ?: ArrayList()
+                list?.map { url ->
+                    url.toString()
+                }?.let { images.addAll(it) }
+                val itemData = diaryItem[resultCode]
+                diaryItem[resultCode] = itemData.copy(images = images)
             }
         }
     }

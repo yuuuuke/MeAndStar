@@ -5,6 +5,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
@@ -19,12 +20,18 @@ import java.util.ArrayList;
 public class PicAdapter extends RecyclerView.Adapter<PicAdapter.BaseHolder> {
 
     private ArrayList<PicItem> mData;
+    private int maxCount = Integer.MAX_VALUE;
+    private int count = 0;
     public ImageLoader loader;
 
     public void setData(ArrayList<PicItem> data) {
         loader = new ImageLoader();
         loader.initLoader();
         this.mData = data;
+    }
+
+    public void setCount(int count) {
+        this.maxCount = count;
     }
 
     @NonNull
@@ -73,7 +80,16 @@ public class PicAdapter extends RecyclerView.Adapter<PicAdapter.BaseHolder> {
         private View.OnClickListener listener = new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                if(count >= maxCount){
+                    Toast.makeText(v.getContext(), "最多选择" + maxCount + "张图片", Toast.LENGTH_SHORT).show();
+                    return;
+                }
                 item.setSelected(!item.isSelected());
+                if(item.isSelected()){
+                    count ++;
+                }else{
+                    count --;
+                }
                 notifyItemChanged(getAbsoluteAdapterPosition());
             }
         };

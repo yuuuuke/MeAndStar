@@ -8,7 +8,7 @@ import com.zhpew.meandstar.db.dbEntity.CommemorationDayEntity
 import com.zhpew.meandstar.db.dbEntity.DiaryEntity
 
 @Database(entities = [CommemorationDayEntity::class, DiaryEntity::class], version = 1, exportSchema = false)
-@TypeConverters(CustomConverter::class,DiaryItemConverter::class)
+@TypeConverters(CustomConverter::class)
 public abstract class StarRoomDatabase : RoomDatabase() {
 
     abstract fun CommemorationDao(): CommemorationDAO
