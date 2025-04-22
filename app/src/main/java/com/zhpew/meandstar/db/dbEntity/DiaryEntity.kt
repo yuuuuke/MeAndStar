@@ -11,13 +11,14 @@ data class DiaryEntity(
     var editTime: Long,
     var title: String,
     var textContent: String,
-    var diaryItem:SnapshotStateList<DiaryItemEntity>,
+    var diaryItem: ArrayList<DiaryItemEntity>,
     var bg: String?,
 )
 
 data class DiaryItemEntity(
     // 0 图片，1 文字
     var type: Int = 0,
-    var text: String,
-    var index:Int
+    var text: String?,
+    var images: ArrayList<String>?,
+    var index: Int
 )

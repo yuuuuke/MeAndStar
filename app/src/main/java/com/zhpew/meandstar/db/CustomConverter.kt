@@ -3,6 +3,7 @@ package com.zhpew.meandstar.db
 import androidx.room.TypeConverter
 import com.google.gson.Gson
 import com.google.gson.reflect.TypeToken
+import java.util.Objects
 
 class CustomConverter {
     @TypeConverter
@@ -11,7 +12,7 @@ class CustomConverter {
     }
 
     @TypeConverter
-    fun fromArrayList(list:ArrayList<String>):String{
+    fun fromArrayList(list:ArrayList<Any>):String{
         return Gson().toJson(list)
     }
 }

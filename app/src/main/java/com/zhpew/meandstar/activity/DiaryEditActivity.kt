@@ -6,24 +6,19 @@ import android.widget.Toast
 import androidx.activity.result.ActivityResultLauncher
 import androidx.activity.result.PickVisualMediaRequest
 import androidx.activity.result.contract.ActivityResultContracts
-import androidx.activity.result.contract.ActivityResultContracts.PickVisualMedia.VisualMediaType
 import androidx.compose.foundation.*
 import androidx.compose.foundation.layout.*
-import androidx.compose.foundation.lazy.grid.GridCells
-import androidx.compose.foundation.lazy.grid.GridItemSpan
-import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.BasicTextField
-import androidx.compose.material3.Card
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.snapshots.SnapshotStateList
 import androidx.compose.runtime.toMutableStateList
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.layout.layout
 import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.painterResource
@@ -34,10 +29,10 @@ import com.bumptech.glide.integration.compose.ExperimentalGlideComposeApi
 import com.bumptech.glide.integration.compose.GlideImage
 import com.zhpew.meandstar.R
 import com.zhpew.meandstar.base.BaseActivity
-import com.zhpew.meandstar.db.dbEntity.DiaryEntity
 import com.zhpew.meandstar.db.dbEntity.DiaryItemEntity
 import com.zhpew.meandstar.ext.Go2Dp
 import com.zhpew.meandstar.ext.noAnimClick
+import com.zhpew.meandstar.utils.getScreenWidth
 import com.zhpew.meandstar.vm.DateEditViewModel
 import com.zhpew.meandstar.widget.CustomActionBar
 
@@ -54,27 +49,23 @@ class DiaryEditActivity : BaseActivity<DateEditViewModel>() {
         }
     }
 
+    private val imageSize = (getScreenWidth().Go2Dp - 28).div(4).dp
+
     private lateinit var picker: ActivityResultLauncher<PickVisualMediaRequest>
-    val data = mutableStateOf<DiaryEntity?>(null)
+    private var isSelectedPhoto = -1
     val title = mutableStateOf<String>("")
-    val content = mutableStateOf<String>("")
+    private val diaryItem = SnapshotStateList<DiaryItemEntity>()
 
     override fun initData() {
-        picker = registerForActivityResult(ActivityResultContracts.PickMultipleVisualMedia(3)) {
 
-        }
         val id = intent.getIntExtra(DIARY_ID, -1)
 
         if (id != -1) {
             vm.getDiaryById(1)
             vm.diaryLiveData.observe(this) {
-                data.value = it
-                title.value = data.value!!.title
-                content.value = data.value!!.textContent
+                diaryItem.addAll(it.diaryItem.toMutableStateList())
+                title.value = it.title
             }
-        } else {
-            data.value =
-                DiaryEntity(0, 0, "", "", ArrayList<DiaryItemEntity>().toMutableStateList(), null)
         }
 
         vm.cuLiveData.observe(this) {
@@ -110,107 +101,173 @@ class DiaryEditActivity : BaseActivity<DateEditViewModel>() {
                 onBackPress = {
                     onBackPressedDispatcher.onBackPressed()
                 }, rightImg = painterResource(id = R.drawable.icon_done), rightIconPress = {
-                    data.value!!.title = title.value
-                    data.value!!.textContent = content.value
-                    data.value!!.editTime = System.currentTimeMillis()
-                    vm.updateOrCreateData(data.value!!)
+//                    data.value!!.title = title.value
+//                    data.value!!.editTime = System.currentTimeMillis()
+//                    vm.updateOrCreateData(data.value!!)
                 })
-            data.value?.let {
-                Column(
-                    modifier = Modifier
-                        .fillMaxWidth(),
-                    horizontalAlignment = Alignment.CenterHorizontally,
-                    content = {
-                        Box(
-                            modifier = Modifier
-                                .padding(vertical = 8.dp, horizontal = 14.dp)
-                                .height(52.dp)
-                                .fillMaxWidth()
-                                .clip(
-                                    RoundedCornerShape(12.dp)
-                                )
-                                .background(colorResource(R.color.color_EC928E)),
-                            contentAlignment = Alignment.Center
-                        ) {
-                            BasicTextField(
-                                value = title.value,
-                                onValueChange = {
-                                    if (it.length > 25)
-                                        return@BasicTextField
-                                    title.value = it
-                                },
-                                modifier = Modifier
-                                    .padding(start = 15.dp, end = 15.dp)
-                                    .fillMaxWidth(),
-                                textStyle = TextStyle(
-                                    fontSize = 16.sp,
-                                    color = colorResource(id = R.color.text_color)
-                                )
+            Column(
+                modifier = Modifier
+                    .fillMaxWidth(),
+                horizontalAlignment = Alignment.CenterHorizontally,
+                content = {
+                    Box(
+                        modifier = Modifier
+                            .padding(vertical = 8.dp, horizontal = 14.dp)
+                            .height(52.dp)
+                            .fillMaxWidth()
+                            .clip(
+                                RoundedCornerShape(12.dp)
                             )
+                            .background(colorResource(R.color.color_EC928E)),
+                        contentAlignment = Alignment.Center
+                    ) {
+                        BasicTextField(
+                            value = title.value,
+                            onValueChange = {
+                                if (it.length > 25)
+                                    return@BasicTextField
+                                title.value = it
+                            },
+                            modifier = Modifier
+                                .padding(start = 15.dp, end = 15.dp)
+                                .fillMaxWidth(),
+                            textStyle = TextStyle(
+                                fontSize = 16.sp,
+                                color = colorResource(id = R.color.text_color)
+                            )
+                        )
+                    }
+                    diaryItem.forEach { item ->
+                        if (item.type == 0) {
+                            // 图片
+                            DiaryImageView(item)
+                        } else {
+                            // 文字
+                            DiaryTextView(item)
                         }
-                        data.value!!.diaryItem.forEach { item ->
-                            if (item.type == 0) {
-                                // 图片
-                            } else {
-                                // 文字
-                                DiaryTextView(item)
-                            }
-                        }
-                        Row {
-                            Text(
-                                text = "123",
-                                modifier = Modifier.noAnimClick {
+                    }
+                    Row(
+                        modifier = Modifier.fillMaxWidth(),
+                        horizontalArrangement = Arrangement.SpaceAround
+                    ) {
+                        Text(
+                            text = "添加段落",
+                            modifier = Modifier
+                                .clip(RoundedCornerShape(5.dp))
+                                .background(colorResource(R.color.color_22856C))
+                                .padding(horizontal = 8.dp)
+                                .noAnimClick {
                                     // 添加一行文字
-                                    data.value!!.diaryItem.add(
+                                    diaryItem.add(
                                         DiaryItemEntity(
                                             1,
                                             "",
-                                            data.value!!.diaryItem.size
+                                            null,
+                                            diaryItem.size
                                         )
                                     )
                                 }
-                            )
+                        )
 
-                            Text(
-                                text = "4656",
-                                modifier = Modifier.noAnimClick {
+                        Text(
+                            text = "添加图片",
+                            modifier = Modifier
+                                .clip(RoundedCornerShape(5.dp))
+                                .background(colorResource(R.color.color_22856C))
+                                .padding(horizontal = 8.dp)
+                                .noAnimClick {
                                     // 添加一行图片
+                                    picker = registerForActivityResult(
+                                        ActivityResultContracts.PickMultipleVisualMedia(4)
+                                    ) {
+                                        val images = ArrayList<String>()
+                                        images.addAll(it.map { url ->
+                                            url.toString()
+                                        })
+                                        diaryItem.add(
+                                            DiaryItemEntity(
+                                                0,
+                                                "",
+                                                images,
+                                                diaryItem.size
+                                            )
+                                        )
+                                    }
                                     picker.launch(PickVisualMediaRequest(ActivityResultContracts.PickVisualMedia.ImageOnly))
                                 }
-                            )
-                        }
-                    })
-            }
+                        )
+                    }
+                })
         }
     }
 
     @Composable
     fun DiaryTextView(item: DiaryItemEntity) {
-//        Box(
-//            modifier = Modifier
-//                .padding(vertical = 10.dp, horizontal = 8.dp)
-//                .clip(
-//                    RoundedCornerShape(12.dp)
-//                )
-//                .background(colorResource(id = R.color.color_E46962)),
-//            contentAlignment = Alignment.Center
-//
-//        ) {
         BasicTextField(
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(5.dp)
+                .padding(vertical = 8.dp, horizontal = 14.dp)
                 .clip(
                     RoundedCornerShape(12.dp)
                 )
-                .background(colorResource(id = R.color.color_E46962)),
+                .background(colorResource(id = R.color.color_E46962))
+                .padding(8.dp),
             textStyle = TextStyle(
                 fontSize = 16.sp,
                 color = colorResource(id = R.color.text_color)
             ),
-            value = item.text,
-            onValueChange = { data.value?.diaryItem?.get(item.index)?.text = it },
+            value = item.text ?: "",
+            onValueChange = {
+                val itemData = diaryItem[item.index]
+                diaryItem[item.index] = itemData.copy(text = it)
+            },
         )
-//        }
+    }
+
+    @OptIn(ExperimentalGlideComposeApi::class)
+    @Composable
+    fun DiaryImageView(item: DiaryItemEntity) {
+        Row(horizontalArrangement = Arrangement.Start) {
+            item.images?.forEach {
+                GlideImage(
+                    model = it,
+                    contentDescription = "",
+                    modifier = Modifier
+                        .padding(vertical = 8.dp, horizontal = 14.dp)
+                        .width(imageSize)
+                        .height(imageSize)
+                        .clip(RoundedCornerShape(5.dp))
+                        .noAnimClick {
+                            // 查看大图
+                        }
+                )
+            }
+            if ((item.images?.size ?: 0) < 4) {
+                GlideImage(
+                    model = R.drawable.img_add,
+                    contentDescription = "",
+                    modifier = Modifier
+                        .width(imageSize)
+                        .height(imageSize)
+                        .padding(vertical = 8.dp, horizontal = 14.dp)
+                        .clip(RoundedCornerShape(5.dp))
+                        .noAnimClick {
+                            picker = registerForActivityResult(
+                                ActivityResultContracts.PickMultipleVisualMedia(
+                                    4 - (item.images?.size ?: 0)
+                                )
+                            ) {
+                                val images = item.images ?: ArrayList()
+                                images.addAll(it.map { url ->
+                                    url.toString()
+                                })
+                                val itemData = diaryItem[item.index]
+                                diaryItem[item.index] = itemData.copy(images = images)
+                            }
+                            picker.launch(PickVisualMediaRequest(ActivityResultContracts.PickVisualMedia.ImageOnly))
+                        }
+                )
+            }
+        }
     }
 }
