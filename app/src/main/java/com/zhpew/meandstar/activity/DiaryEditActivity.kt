@@ -2,10 +2,12 @@ package com.zhpew.meandstar.activity
 
 import android.content.Context
 import android.content.Intent
+import android.util.Log
 import android.widget.Toast
 import androidx.activity.result.ActivityResultLauncher
 import androidx.activity.result.PickVisualMediaRequest
 import androidx.compose.foundation.background
+import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -26,27 +28,32 @@ import androidx.compose.runtime.toMutableStateList
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.layout.layout
 import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.TextStyle
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.bumptech.glide.integration.compose.ExperimentalGlideComposeApi
 import com.bumptech.glide.integration.compose.GlideImage
+import com.bumptech.glide.load.resource.bitmap.CenterCrop
 import com.zhpew.imagepickermodule.REQUEST_CODE
-import com.zhpew.imagepickermodule.Type
 import com.zhpew.imagepickermodule.activity.SelectPicActivity
 import com.zhpew.imagepickermodule.bean.PicItem
 import com.zhpew.imagepickermodule.startPicker
 import com.zhpew.meandstar.R
 import com.zhpew.meandstar.base.BaseActivity
+import com.zhpew.meandstar.db.dbEntity.DiaryEntity
 import com.zhpew.meandstar.db.dbEntity.DiaryItemEntity
 import com.zhpew.meandstar.ext.Go2Dp
 import com.zhpew.meandstar.ext.noAnimClick
 import com.zhpew.meandstar.utils.getScreenWidth
 import com.zhpew.meandstar.vm.DateEditViewModel
 import com.zhpew.meandstar.widget.CustomActionBar
+import java.io.File
+import java.util.Arrays
 
 class DiaryEditActivity : BaseActivity<DateEditViewModel>() {
 
@@ -61,10 +68,8 @@ class DiaryEditActivity : BaseActivity<DateEditViewModel>() {
         }
     }
 
-    private val imageSize = (getScreenWidth().Go2Dp - 28).div(4).dp
+    private val imageSize = ((getScreenWidth().Go2Dp - 60).div(4)).toInt()
 
-    private lateinit var picker: ActivityResultLauncher<PickVisualMediaRequest>
-    private var isSelectedPhoto = -1
     val title = mutableStateOf<String>("")
     private val diaryItem = SnapshotStateList<DiaryItemEntity>()
 
@@ -87,7 +92,6 @@ class DiaryEditActivity : BaseActivity<DateEditViewModel>() {
         }
     }
 
-    @OptIn(ExperimentalGlideComposeApi::class)
     @Composable
     override fun InitComposeView() {
 
@@ -113,9 +117,13 @@ class DiaryEditActivity : BaseActivity<DateEditViewModel>() {
                 onBackPress = {
                     onBackPressedDispatcher.onBackPressed()
                 }, rightImg = painterResource(id = R.drawable.icon_done), rightIconPress = {
-//                    data.value!!.title = title.value
-//                    data.value!!.editTime = System.currentTimeMillis()
-//                    vm.updateOrCreateData(data.value!!)
+                    val data = DiaryEntity(
+                        editTime = System.currentTimeMillis(),
+                        title = title.value,
+                        bg = null,
+                        diaryItem = diaryItem.toList()
+                    )
+                    vm.updateOrCreateData(data)
                 })
             Column(
                 modifier = Modifier
@@ -159,15 +167,19 @@ class DiaryEditActivity : BaseActivity<DateEditViewModel>() {
                         }
                     }
                     Row(
-                        modifier = Modifier.fillMaxWidth(),
+                        modifier = Modifier.fillMaxWidth().padding(4.dp),
                         horizontalArrangement = Arrangement.SpaceAround
                     ) {
                         Text(
                             text = "添加段落",
+                            color= colorResource(R.color.white),
+                            textAlign = TextAlign.Center,
                             modifier = Modifier
                                 .clip(RoundedCornerShape(5.dp))
-                                .background(colorResource(R.color.color_22856C))
-                                .padding(horizontal = 8.dp)
+                                .height(30.dp)
+                                .width(100.dp)
+                                .background(colorResource(R.color.color_FF6D4A))
+                                .padding(horizontal = 8.dp, vertical = 5.5.dp)
                                 .noAnimClick {
                                     // 添加一行文字
                                     diaryItem.add(
@@ -183,16 +195,19 @@ class DiaryEditActivity : BaseActivity<DateEditViewModel>() {
 
                         Text(
                             text = "添加图片",
+                            color= colorResource(R.color.white),
+                            textAlign = TextAlign.Center,
                             modifier = Modifier
                                 .clip(RoundedCornerShape(5.dp))
-                                .background(colorResource(R.color.color_22856C))
-                                .padding(horizontal = 8.dp)
+                                .height(30.dp)
+                                .width(100.dp)
+                                .background(colorResource(R.color.color_FF6D4A))
+                                .padding(horizontal = 8.dp, vertical = 5.5.dp)
                                 .noAnimClick {
                                     // 添加一行图片
                                     startPicker {
                                         context = this@DiaryEditActivity
-                                        maxImage = 3
-                                        type = Type.ALL
+                                        maxImage = 4
                                     }
                                 }
                         )
@@ -227,16 +242,27 @@ class DiaryEditActivity : BaseActivity<DateEditViewModel>() {
     @OptIn(ExperimentalGlideComposeApi::class)
     @Composable
     fun DiaryImageView(item: DiaryItemEntity) {
-        Row(horizontalArrangement = Arrangement.Start) {
+        Row(
+            horizontalArrangement = Arrangement.Start,
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(horizontal = 14.dp)
+        ) {
             item.images?.forEach {
                 GlideImage(
-                    model = it,
+                    model = File(it),
                     contentDescription = "",
+                    contentScale = ContentScale.Crop,
                     modifier = Modifier
-                        .padding(vertical = 8.dp, horizontal = 14.dp)
-                        .width(imageSize)
-                        .height(imageSize)
+                        .padding(vertical = 8.dp, horizontal = 4.dp)
+                        .width(imageSize.dp)
+                        .height(imageSize.dp)
                         .clip(RoundedCornerShape(5.dp))
+                        .border(
+                            1.dp,
+                            colorResource(id = R.color.color_22856C),
+                            RoundedCornerShape(5.dp)
+                        )
                         .noAnimClick {
                             // 查看大图
                         }
@@ -246,19 +272,31 @@ class DiaryEditActivity : BaseActivity<DateEditViewModel>() {
                 GlideImage(
                     model = R.drawable.img_add,
                     contentDescription = "",
+                    contentScale = ContentScale.Crop,
                     modifier = Modifier
-                        .width(imageSize)
-                        .height(imageSize)
-                        .padding(vertical = 8.dp, horizontal = 14.dp)
-                        .clip(RoundedCornerShape(5.dp))
+                        .padding(vertical = 8.dp, horizontal = 4.dp)
+                        .width(imageSize.dp)
+                        .height(imageSize.dp)
+                        .border(
+                            1.dp,
+                            colorResource(id = R.color.color_22856C),
+                            RoundedCornerShape(5.dp)
+                        )
+                        .padding(10.dp)
                         .noAnimClick {
-
+                            //添加图片
+                            startPicker {
+                                context = this@DiaryEditActivity
+                                maxImage = 4 - (item.images?.size ?: 0)
+                                code = item.index
+                            }
                         }
                 )
             }
         }
     }
 
+    @Deprecated("Deprecated in Java")
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         super.onActivityResult(requestCode, resultCode, data)
         if (requestCode == REQUEST_CODE) {
@@ -267,11 +305,11 @@ class DiaryEditActivity : BaseActivity<DateEditViewModel>() {
             if (list?.size == 0) {
                 return
             }
-            if (resultCode == -1) {
+            if (resultCode == Int.MAX_VALUE) {
                 val images = ArrayList<String>()
 
-                list?.map { url ->
-                    url.toString()
+                list?.map { item ->
+                    item.url
                 }?.let { images.addAll(it) }
                 diaryItem.add(
                     DiaryItemEntity(

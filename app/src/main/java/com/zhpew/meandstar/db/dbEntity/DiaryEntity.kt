@@ -12,27 +12,9 @@ data class DiaryEntity(
     var id: Int = -1,
     var editTime: Long,
     var title: String,
-    var textContent: String,
     var bg: String?,
-    var diaryItemJson: String = ""
-){
-
-    @Ignore
-    var diaryItem: ArrayList<DiaryItemEntity>? = null
-        set(value) {
-            field = value
-            field?.let { setChildren(it) }
-        }
-
-    fun setChildren(children: List<DiaryItemEntity>) {
-        this.diaryItem = children as ArrayList<DiaryItemEntity>
-        this.diaryItemJson = DiaryItemConverter().fromArrayList(children)
-    }
-
-    fun getChildren(): List<DiaryItemEntity> {
-        return DiaryItemConverter().fromString(diaryItemJson)
-    }
-}
+    var diaryItem: List<DiaryItemEntity>
+)
 
 data class DiaryItemEntity(
     // 0 图片，1 文字

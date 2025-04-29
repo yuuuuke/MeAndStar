@@ -21,4 +21,10 @@
     <color name="color_E46962">#E46962</color>
     <color name="color_B63028">#B63028</color>
     <color name="color_EC928E">#EC928E</color>
+<!--    活力配色  -->
+    <color name="color_FF6D4A">#FF6D4A</color>
+    <color name="color_FFB300">#FFB300</color>
+<!--    柔和配色-->
+    <color name="color_FF8A80">#FF8A80</color>
+    <color name="color_AB6857">#AB6857</color>
 </resources>

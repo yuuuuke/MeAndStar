@@ -118,14 +118,6 @@ class DiaryFragment : BaseFragment<DiaryListViewModel>() {
                     lineHeight = 15.sp,
                     overflow = TextOverflow.Ellipsis
                 )
-
-                Text(
-                    text = data.textContent,
-                    color = colorResource(id = R.color.text_color),
-                    fontSize = 12.sp,
-                    lineHeight = 15.sp,
-                    overflow = TextOverflow.Ellipsis
-                )
             }
         }
     }

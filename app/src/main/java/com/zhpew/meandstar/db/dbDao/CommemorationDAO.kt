@@ -3,14 +3,6 @@ package com.zhpew.meandstar.db.dbDao
 import androidx.room.*
 import com.zhpew.meandstar.db.dbEntity.CommemorationDayEntity
 
-//fun getAllCommemorationInfo():List<CommemorationDayBean>{
-//    val list = ArrayList<CommemorationDayBean>()
-//    list.add(CommemorationDayBean(null,"和星星相识",1663430400000))
-//    list.add(CommemorationDayBean(null,"和星星相见",1664726400000))
-//    list.add(CommemorationDayBean(null,"和星星相爱",1672416000000))
-//    return list
-//}
-
 @Dao
 interface CommemorationDAO {
     @Query("SELECT * FROM table_commemoration order by date desc")

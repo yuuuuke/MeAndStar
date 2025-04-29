@@ -11,7 +11,6 @@ class ImagePickerEntry {
     var context: Activity? = null
     var code = Int.MAX_VALUE
     var maxImage: Int = Int.MAX_VALUE
-    var type: Type = Type.ALL
 }
 
 fun startPicker(block: ImagePickerEntry.() -> Unit) {
@@ -20,21 +19,6 @@ fun startPicker(block: ImagePickerEntry.() -> Unit) {
         val intent = Intent(it, SelectPicActivity::class.java)
         intent.putExtra("code", entry.code)
         intent.putExtra("count", entry.maxImage)
-        intent.putExtra("type", entry.type)
         it.startActivityForResult(intent, REQUEST_CODE)
-    }
-}
-
-sealed class Type : Serializable {
-    data object ALL : Type() {
-        private fun readResolve(): Any = ALL
-    }
-
-    data object IMAGE : Type() {
-        private fun readResolve(): Any = IMAGE
-    }
-
-    data object VIDEO : Type() {
-        private fun readResolve(): Any = VIDEO
     }
 }

@@ -8,15 +8,15 @@ import com.zhpew.meandstar.db.dbEntity.DiaryItemEntity
 
 class DiaryItemConverter {
     @TypeConverter
-    fun fromString(value: String): ArrayList<DiaryItemEntity> {
-        return Gson().fromJson<ArrayList<DiaryItemEntity>>(
+    fun fromString(value: String): List<DiaryItemEntity> {
+        return Gson().fromJson(
             value,
-            ArrayList<String>().javaClass.genericSuperclass
-        )
+            Array<DiaryItemEntity>::class.java
+        ).toList()
     }
 
     @TypeConverter
-    fun fromArrayList(list: ArrayList<DiaryItemEntity>): String {
+    fun fromArrayList(list: List<DiaryItemEntity>): String {
         return Gson().toJson(list)
     }
 }
